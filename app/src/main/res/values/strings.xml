@@ -1,4 +1,14 @@
 <resources>
-    <string name="app_name">MyGithubUser</string>
+    <string name="app_name">My Github User</string>
+    <string name="app_detail">My Github User Detail</string>
     <string name="splash">My Github User</string>
+    <string name="username">Username</string>
+    <string name="no_id">No ID</string>
+    <string name="search">Search</string>
+    <string name="search_hint">Input Username</string>
+    <string name="name">Name</string>
+    <string name="followers">Followers</string>
+    <string name="following">Following</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

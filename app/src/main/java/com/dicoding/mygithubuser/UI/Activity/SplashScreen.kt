@@ -1,9 +1,10 @@
-package com.dicoding.mygithubuser
+package com.dicoding.mygithubuser.UI.Activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
+import com.dicoding.mygithubuser.R
 
 class SplashScreen : AppCompatActivity() {
     private val SPLASH_TIME:Long = 3000
