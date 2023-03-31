@@ -6,17 +6,26 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.Menu
+import android.view.MenuItem
 import android.view.View
 import androidx.appcompat.widget.SearchView
-import android.widget.Toast
 import androidx.activity.viewModels
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import androidx.datastore.preferences.preferencesDataStore
+import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dicoding.mygithubuser.Adapter.UserListAdapter
+import com.dicoding.mygithubuser.Preference.SettingPreference
 import com.dicoding.mygithubuser.R
 import com.dicoding.mygithubuser.Response.GithubUserListItem
 import com.dicoding.mygithubuser.ViewModel.MainViewModel
+import com.dicoding.mygithubuser.ViewModel.SettingViewModel
+import com.dicoding.mygithubuser.ViewModel.SettingViewModelFactory
 import com.dicoding.mygithubuser.databinding.ActivityMainBinding
 
+private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "settings")
 class MainActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityMainBinding
@@ -39,6 +48,19 @@ class MainActivity : AppCompatActivity() {
         }
 
         mainViewModel.getSearchUser("fitra")
+
+        val pref = SettingPreference.getInstance(dataStore)
+        val settingViewModel = ViewModelProvider(this, SettingViewModelFactory(pref)).get(
+            SettingViewModel::class.java
+        )
+
+        settingViewModel.getThemeSetting().observe(this){ isDarkModeActive: Boolean ->
+            if (isDarkModeActive) {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_YES)
+            } else {
+                AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
+            }
+        }
     }
 
     private fun setUserList(listUserList: List<GithubUserListItem>){
@@ -87,5 +109,15 @@ class MainActivity : AppCompatActivity() {
             }
         })
         return true
+    }
+
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
+        when (item.itemId) {
+            R.id.setting -> {
+                val moveIntent = Intent(this@MainActivity, SettingActivity::class.java)
+                startActivity(moveIntent)
+            }
+        }
+        return super.onOptionsItemSelected(item)
     }
 }
