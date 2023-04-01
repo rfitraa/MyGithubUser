@@ -1,16 +1,19 @@
 package com.dicoding.mygithubuser.ViewModel
 
+import android.app.Application
 import android.util.Log
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import com.dicoding.mygithubuser.Api.ApiConfig
+import com.dicoding.mygithubuser.Database.Favorite
+import com.dicoding.mygithubuser.Repository.FavoriteRepository
 import com.dicoding.mygithubuser.Response.DetailUserResponse
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
 
-class DetailViewModel : ViewModel() {
+class DetailViewModel: ViewModel() {
 
     private val _detailUser = MutableLiveData<DetailUserResponse>()
     val detailUser: LiveData<DetailUserResponse> = _detailUser

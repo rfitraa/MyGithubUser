@@ -117,6 +117,10 @@ class MainActivity : AppCompatActivity() {
                 val moveIntent = Intent(this@MainActivity, SettingActivity::class.java)
                 startActivity(moveIntent)
             }
+            R.id.favorite -> {
+                val moveIntent = Intent(this@MainActivity, FavoriteActivity::class.java)
+                startActivity(moveIntent)
+            }
         }
         return super.onOptionsItemSelected(item)
     }

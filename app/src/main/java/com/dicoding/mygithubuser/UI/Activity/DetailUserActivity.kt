@@ -1,26 +1,31 @@
 package com.dicoding.mygithubuser.UI.Activity
 
-import android.content.Intent.EXTRA_USER
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import androidx.activity.viewModels
 import androidx.annotation.StringRes
-import androidx.viewpager2.widget.ViewPager2
+import androidx.lifecycle.ViewModelProvider
 import com.bumptech.glide.Glide
 import com.dicoding.mygithubuser.Adapter.SectionPagerAdapter
-import com.dicoding.mygithubuser.Adapter.UserListAdapter
+import com.dicoding.mygithubuser.Database.Favorite
 import com.dicoding.mygithubuser.R
 import com.dicoding.mygithubuser.Response.DetailUserResponse
 import com.dicoding.mygithubuser.ViewModel.DetailViewModel
-import com.dicoding.mygithubuser.ViewModel.MainViewModel
+import com.dicoding.mygithubuser.ViewModel.FavoriteViewModel
+import com.dicoding.mygithubuser.ViewModel.FavoriteViewModelFactory
 import com.dicoding.mygithubuser.databinding.ActivityDetailUserBinding
 import com.google.android.material.tabs.TabLayout
 import com.google.android.material.tabs.TabLayoutMediator
 
 class DetailUserActivity : AppCompatActivity() {
     private lateinit var detailUserBinding: ActivityDetailUserBinding
-    private val detailMainViewModel by viewModels<DetailViewModel>()
+    private val detailViewModel by viewModels<DetailViewModel>()
+    private lateinit var favoriteViewModel: FavoriteViewModel
+
+    private var button: Boolean = false
+    private var favorite: Favorite? = null
 
     companion object {
         const val EXTRA_DETAIL = "extra_detail"
@@ -38,20 +43,77 @@ class DetailUserActivity : AppCompatActivity() {
 
         supportActionBar?.title = getString(R.string.app_detail)
 
-        detailMainViewModel.detailUser.observe(this) { detailUser ->
+        favoriteViewModel = obtainViewModel(this@DetailUserActivity)
+
+        detailViewModel.detailUser.observe(this) { detailUser ->
             if (detailUser != null) {
                 setUserDetail(detailUser)
+                favorite = Favorite(detailUser.id!!, detailUser.login)
+                favoriteViewModel.getAllFavorites().observe(this){favoriteUser ->
+                    if (favoriteUser != null){
+                        setUserFavorite(favoriteUser, detailUser)
+                    }
+                }
+                setFavoriteEvent(detailUser)
             }
         }
 
-        val detailUser = intent.getStringExtra(EXTRA_DETAIL).toString()
-        detailMainViewModel.getDetailUser(detailUser)
+        var detailUser = intent.getStringExtra(EXTRA_DETAIL).toString()
+        detailViewModel.getDetailUser(detailUser)
 
 
-        detailMainViewModel.isLoading.observe(this, {
+        detailViewModel.isLoading.observe(this, {
             showLoading(it)
         })
 
+    }
+
+    private fun obtainViewModel(activity: AppCompatActivity): FavoriteViewModel {
+        val factory = FavoriteViewModelFactory.getInstance(activity.application)
+        return ViewModelProvider(activity, factory).get(FavoriteViewModel::class.java)
+    }
+
+    private fun setFavoriteEvent(detailUser: DetailUserResponse) {
+        detailUserBinding.fabFavorite.setOnClickListener {
+            if (!button){
+                button = true
+                detailUserBinding.fabFavorite.setImageResource(R.drawable.ic_favorite)
+                insertToFavorite(detailUser)
+            }else{
+                button = false
+                detailUserBinding.fabFavorite.setImageResource(R.drawable.ic_unfavorite)
+                deleteFromFavorite(detailUser)
+            }
+        }
+    }
+
+    private fun deleteFromFavorite(detailUser: DetailUserResponse) {
+        favorite.let { favorite ->
+            favorite?.id = detailUser.id!!
+            favorite?.username = detailUser.login
+            favorite?.avatarUrl = detailUser.avatarUrl
+            favoriteViewModel.delete(favorite as Favorite)
+            Toast.makeText(this, "Successfully Remove from Favorite", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun insertToFavorite(detailUser: DetailUserResponse) {
+        favorite.let { favorite ->
+            favorite?.id = detailUser.id!!
+            favorite?.username = detailUser.login
+            favorite?.avatarUrl = detailUser.avatarUrl
+            favoriteViewModel.insert(favorite as Favorite)
+            Toast.makeText(this, "Successfully Added to Favorite", Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private fun setUserFavorite(favoriteUser: List<Favorite>, detailUser: DetailUserResponse) {
+        for (fav in favoriteUser){
+            if (detailUser.id == fav.id){
+                button = true
+                detailUserBinding.fabFavorite.setImageResource(R.drawable.ic_favorite)
+            }
+        }
     }
 
     private fun setUserDetail(detailUser: DetailUserResponse){
