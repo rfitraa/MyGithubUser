@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.dicoding.mygithubuser.Database.Favorite
 import com.dicoding.mygithubuser.Helper.FavoriteDiffCallback
-import com.dicoding.mygithubuser.Response.GithubUserListItem
 import com.dicoding.mygithubuser.UI.Activity.DetailUserActivity
 import com.dicoding.mygithubuser.databinding.ItemUserListBinding
 
